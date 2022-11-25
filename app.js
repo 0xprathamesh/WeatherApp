@@ -22,7 +22,7 @@ app.get("/", function (req, res) {
 
  })
 
-app.post("/", function(req, res) {
+ app.post("/", function (req, res) {
   console.log(req.body.cityName);
   const query = req.body.cityName;
 
@@ -31,10 +31,12 @@ app.post("/", function(req, res) {
   const unit = "metric";
   const url = "https://api.openweathermap.org/data/2.5/weather?q=" + query + "&appid=" + apiKey + "&units=" + unit;
 
-  https.get(url, function(response) {
+ https.get(url, query, function (response) {
 
-    console.log(response.statusCode);
-    response.on("data", function(data) {
+   console.log(response.statusCode);
+   if (response.statusCode === 200) {
+    response.on("data", function (data) {
+     
       const weatherData = JSON.parse(data)
       const temp = weatherData.main.temp;
       const humidity = weatherData.main.humidity;
@@ -44,17 +46,32 @@ app.post("/", function(req, res) {
       const weatherDescription = weatherData.weather[0].description
       const icon = weatherData.weather[0].icon
       const imageURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png"
-      res.render('temprature', {
-        weatherDescription: weatherDescription,
-        query: query,
-        temp: temp,
-        imageURL: imageURL,
-        humidity: humidity,
-        wind: wind,
-        country: country,
-        pressure: pressure
-      })
+
+    
+        res.render('temprature', {
+          weatherDescription: weatherDescription,
+          query: query,
+          temp: temp,
+          imageURL: imageURL,
+          humidity: humidity,
+          wind: wind,
+          country: country,
+          pressure: pressure
+        })
+    
+      
+     
+
+
+
     });
+   } else {
+     res.render('failure')
+   }
+
+   
+
+
   });
 
 })
